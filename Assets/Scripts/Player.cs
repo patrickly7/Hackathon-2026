@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
     public float movementSpeed = 5.0f;
     public float rotationSpeed = 100f; // Degrees
 
+    public AudioSource flipCardSFX;
+
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -28,8 +30,8 @@ public class Player : MonoBehaviour
             var movement = transform.forward * verticalInput * movementSpeed * Time.fixedDeltaTime;
 
             _rigidbody.MovePosition(_rigidbody.position + movement);
+
+            flipCardSFX.Play();
         }
     }
-
-
 }
