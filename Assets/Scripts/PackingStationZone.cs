@@ -17,13 +17,12 @@ public class PackingStationZone : MonoBehaviour
 
             packingSFX.Play();
 
-            float randomX = Random.Range(-20, 20);
-            float randomZ = Random.Range(-20, 20);
+            float randomX = Random.Range(-8, 8);
 
             Vector3 newPosition = new Vector3(
                 randomX,
-                collision.transform.position.y,
-                randomZ
+                9.5f,
+                -18f
             );
 
             collision.transform.position = newPosition;
