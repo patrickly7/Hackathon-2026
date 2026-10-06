@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class Timer : MonoBehaviour
             isTimerFinished = true;
 
             endGameWhistleSFX.Play();
+
+            SceneManager.LoadSceneAsync("Results");
         }
 
         UpdateDisplay();
