@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
 
     private float movementSpeed = 5.0f;
     private float rotationSpeed = 100f;
-    private float jumpForce = 3.0f;
+    private float jumpForce = 20.0f;
 
     private float gravityMultiplier = 0.25f;
     private float jumpGravityMultiplier = 2.0f;
@@ -241,7 +241,9 @@ public class Player : MonoBehaviour
             var randomContainer = containers[Random.Range(0, containers.Length)];
 
             var spawnPosition = randomContainer.transform.position;
+
             _rigidbody.position = spawnPosition;
+            _rigidbody.rotation = Quaternion.identity;
         }
 
         _isGrounded = true;
