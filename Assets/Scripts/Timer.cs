@@ -6,7 +6,7 @@ public class Timer : MonoBehaviour
 {
     [SerializeField] private float startingTime = 180f;
 
-    private TMP_Text timerText;
+    private TMP_Text _timerText;
     private float timeRemaining;
 
     private bool isTimerFinished;
@@ -16,7 +16,7 @@ public class Timer : MonoBehaviour
 
     private void Start()
     {
-        timerText = GetComponent<TMP_Text>();
+        _timerText = GetComponent<TMP_Text>();
         timeRemaining = startingTime;
         isTimerFinished = false;
 
@@ -47,6 +47,6 @@ public class Timer : MonoBehaviour
         int minutes = Mathf.FloorToInt(timeRemaining / 60f);
         int seconds = Mathf.FloorToInt(timeRemaining % 60f);
 
-        timerText.text = $"{minutes:0}:{seconds:00}";
+        _timerText.text = $"{minutes:0}:{seconds:00}";
     }
 }

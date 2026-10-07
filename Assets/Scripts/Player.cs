@@ -4,6 +4,8 @@ public class Player : MonoBehaviour
 {
     private Rigidbody _rigidbody;
 
+    private const int DEFAULT_HEALTH = 10000;
+
     public float movementSpeed = 5.0f;
     public float rotationSpeed = 100f;
 
@@ -13,14 +15,17 @@ public class Player : MonoBehaviour
     public AudioSource whooshSFX;
     public AudioSource plopSFX;
 
+    private int _playerHealth;
+
     private bool _isGrounded;
     private bool _wasGrounded;
 
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
-
         _rigidbody.useGravity = false;
+
+        _playerHealth = DEFAULT_HEALTH;
 
         _isGrounded = true;
         _wasGrounded = true;
@@ -44,35 +49,26 @@ public class Player : MonoBehaviour
         _wasGrounded = _isGrounded;
 
         // Apply reduced gravity
-        _rigidbody.AddForce(
-            Physics.gravity * gravityMultiplier,
-            ForceMode.Acceleration
-        );
+        _rigidbody.AddForce(Physics.gravity * gravityMultiplier, ForceMode.Acceleration);
 
         // Rotate left/right
-        var turnAmount =
-            horizontalInput * rotationSpeed * Time.fixedDeltaTime;
-
+        var turnAmount = horizontalInput * rotationSpeed * Time.fixedDeltaTime;
         var rotation = Quaternion.Euler(0f, turnAmount, 0f);
 
-        _rigidbody.MoveRotation(
-            _rigidbody.rotation * rotation
-        );
+        _rigidbody.MoveRotation(_rigidbody.rotation * rotation);
 
         // Move forward
         if (verticalInput > 0)
         {
-            var movement =
-                transform.forward *
-                verticalInput *
-                movementSpeed *
-                Time.fixedDeltaTime;
+            var movement = transform.forward * verticalInput * movementSpeed * Time.fixedDeltaTime;
 
-            _rigidbody.MovePosition(
-                _rigidbody.position + movement
-            );
+            _rigidbody.MovePosition(_rigidbody.position + movement);
 
-            // flipCardSFX.Play();
+            // DAMAGE: Decrease health if you're dragging the card across the ground
+            if (_isGrounded && _playerHealth > 0)
+            {
+                _playerHealth -= 1;
+            }
         }
     }
 
@@ -80,7 +76,7 @@ public class Player : MonoBehaviour
     {
         foreach (ContactPoint contact in collision.contacts)
         {
-            // A normal pointing upward means we're standing on something.
+            // A normal pointing upward means we're on top of something
             if (contact.normal.y > 0.5f)
             {
                 _isGrounded = true;
@@ -92,5 +88,84 @@ public class Player : MonoBehaviour
     private void OnCollisionExit(Collision collision)
     {
         _isGrounded = false;
+    }
+
+    public int GetPlayerHealth()
+    {
+        return _playerHealth;
+    }
+
+    public string GetPlayerCondition()
+    {
+        if (_playerHealth > (0.8 * DEFAULT_HEALTH))
+        {
+            return "Near Mint";
+        }
+        else if (_playerHealth > (0.6 * DEFAULT_HEALTH))
+        {
+            return "Lightly Played";
+        }
+        else if (_playerHealth > (0.4 * DEFAULT_HEALTH))
+        {
+            return "Moderately Played";
+        }
+        else if (_playerHealth > (0.2 * DEFAULT_HEALTH))
+        {
+            return "Heavily Played";
+        }
+        else
+        {
+            return "Damaged";
+        }
+    }
+
+    public int GetDefaultHealth()
+    {
+        return DEFAULT_HEALTH;
+    }
+
+    public void HandleCardScoreCalculation()
+    {
+        // Add to score/counts based current condition
+        var playerCondition = GetPlayerCondition();
+        if (playerCondition == "Near Mint")
+        {
+            GameManager.Instance.AddNearMint();
+            GameManager.Instance.AddScore(10);
+        }
+        else if (playerCondition == "Lightly Played")
+        {
+            GameManager.Instance.AddLightlyPlayed();
+            GameManager.Instance.AddScore(8);
+        }
+        else if (playerCondition == "Moderately Played")
+        {
+            GameManager.Instance.AddModeratelyPlayed();
+            GameManager.Instance.AddScore(6);
+        }
+        else if (playerCondition == "Heavily Played")
+        {
+            GameManager.Instance.AddHeavilyPlayed();
+            GameManager.Instance.AddScore(4);
+        }
+        else
+        {
+            GameManager.Instance.AddDamaged();
+            GameManager.Instance.AddScore(2);
+        }
+
+        // Reset player to new rack/container location
+        _playerHealth = DEFAULT_HEALTH;
+
+        _rigidbody.linearVelocity = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
+
+        var randomX = Random.Range(-8, 8);
+        var newPosition = new Vector3(randomX, 9.5f, -18f);
+
+        _rigidbody.position = newPosition;
+
+        _isGrounded = true;
+        _wasGrounded = true;
     }
 }
