@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
 
     private float movementSpeed = 5.0f;
     private float rotationSpeed = 100f;
-    private float jumpForce = 20.0f;
+    private float jumpForce = 5.0f;
 
     private float gravityMultiplier = 0.25f;
     private float jumpGravityMultiplier = 2.0f;
