@@ -5,6 +5,8 @@ public class Player : MonoBehaviour
     private Rigidbody _rigidbody;
 
     private const int DEFAULT_HEALTH = 10000;
+    private const int DRAG_DAMAGE = 1;
+    private const int COLLISION_DAMAGE = 100;
 
     public float movementSpeed = 5.0f;
     public float rotationSpeed = 100f;
@@ -14,6 +16,7 @@ public class Player : MonoBehaviour
     public AudioSource flipCardSFX;
     public AudioSource whooshSFX;
     public AudioSource plopSFX;
+    public AudioSource damageSFX;
 
     private int _playerHealth;
 
@@ -67,7 +70,7 @@ public class Player : MonoBehaviour
             // DAMAGE: Decrease health if you're dragging the card across the ground
             if (_isGrounded && _playerHealth > 0)
             {
-                _playerHealth -= 1;
+                _playerHealth -= DRAG_DAMAGE;
             }
         }
     }
@@ -81,6 +84,30 @@ public class Player : MonoBehaviour
             {
                 _isGrounded = true;
                 return;
+            }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            // Landing on top of something = no damage
+            if (contact.normal.y > 0.5f)
+            {
+                continue;
+            }
+
+            // Direction from the player toward the object
+            var directionToCollision = -contact.normal;
+
+            // How much the collision is coming from the front
+            var forwardAmount = Vector3.Dot(transform.forward, directionToCollision);
+
+            if (forwardAmount > 0.5f && _playerHealth > 0)
+            {
+                damageSFX.Play();
+                _playerHealth -= COLLISION_DAMAGE;
             }
         }
     }
@@ -128,6 +155,7 @@ public class Player : MonoBehaviour
     {
         // Add to score/counts based current condition
         var playerCondition = GetPlayerCondition();
+
         if (playerCondition == "Near Mint")
         {
             GameManager.Instance.AddNearMint();
@@ -160,10 +188,17 @@ public class Player : MonoBehaviour
         _rigidbody.linearVelocity = Vector3.zero;
         _rigidbody.angularVelocity = Vector3.zero;
 
-        var randomX = Random.Range(-8, 8);
-        var newPosition = new Vector3(randomX, 9.5f, -18f);
+        var containers = GameObject.FindGameObjectsWithTag("Container");
 
-        _rigidbody.position = newPosition;
+        if (containers.Length > 0)
+        {
+            var randomContainer = containers[Random.Range(0, containers.Length)];
+
+            var spawnPosition = randomContainer.transform.position;
+            spawnPosition.y = 8f;
+
+            _rigidbody.position = spawnPosition;
+        }
 
         _isGrounded = true;
         _wasGrounded = true;
