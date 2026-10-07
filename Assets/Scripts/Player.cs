@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
 
     private const int DEFAULT_HEALTH = 10000;
     private const int DRAG_DAMAGE = 1;
-    private const int COLLISION_DAMAGE = 100;
+    private const int COLLISION_DAMAGE = 200;
+    private const int JUMP_DAMAGE = 100;
 
     private float movementSpeed = 5.0f;
     private float rotationSpeed = 100f;
@@ -45,6 +46,11 @@ public class Player : MonoBehaviour
         {
             _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             _isGrounded = false;
+
+            if (_playerHealth > 0)
+            {
+                _playerHealth -= JUMP_DAMAGE;
+            }
         }
     }
 
@@ -158,7 +164,11 @@ public class Player : MonoBehaviour
             if (forwardAmount > 0.5f && _playerHealth > 0)
             {
                 damageSFX.Play();
-                _playerHealth -= COLLISION_DAMAGE;
+
+                if (_playerHealth > 0)
+                {
+                    _playerHealth -= COLLISION_DAMAGE;
+                }
             }
         }
     }
