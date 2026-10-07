@@ -3684,8 +3684,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0.375}
   m_LocalScale: {x: 0.5, y: 0.01, z: 0.75}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 301375561}
+  m_Children: []
   m_Father: {fileID: 936108927}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1589605781
@@ -3716,7 +3715,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1589605779}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
