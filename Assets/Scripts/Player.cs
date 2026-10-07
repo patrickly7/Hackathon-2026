@@ -3,15 +3,18 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private Rigidbody _rigidbody;
+    private Collider _collider;
 
     private const int DEFAULT_HEALTH = 10000;
     private const int DRAG_DAMAGE = 1;
     private const int COLLISION_DAMAGE = 100;
 
-    public float movementSpeed = 5.0f;
-    public float rotationSpeed = 100f;
+    private float movementSpeed = 5.0f;
+    private float rotationSpeed = 100f;
+    private float jumpForce = 3.0f;
 
-    public float gravityMultiplier = 0.25f;
+    private float gravityMultiplier = 0.25f;
+    private float jumpGravityMultiplier = 2.0f;
 
     public AudioSource flipCardSFX;
     public AudioSource whooshSFX;
@@ -26,6 +29,8 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _collider = GetComponentInChildren<Collider>();
+
         _rigidbody.useGravity = false;
 
         _playerHealth = DEFAULT_HEALTH;
@@ -34,16 +39,30 @@ public class Player : MonoBehaviour
         _wasGrounded = true;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
+        {
+            _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _isGrounded = false;
+        }
+    }
+
     private void FixedUpdate()
     {
         var horizontalInput = Input.GetAxis("Horizontal");
         var verticalInput = Input.GetAxis("Vertical");
 
+        // Check whether we're standing on something
+        UpdateGroundedState();
+
+        // Play whoosh when becoming airborne
         if (_wasGrounded && !_isGrounded)
         {
             whooshSFX.Play();
         }
 
+        // Play plop when landing
         if (!_wasGrounded && _isGrounded)
         {
             plopSFX.Play();
@@ -51,8 +70,15 @@ public class Player : MonoBehaviour
 
         _wasGrounded = _isGrounded;
 
-        // Apply reduced gravity
-        _rigidbody.AddForce(Physics.gravity * gravityMultiplier, ForceMode.Acceleration);
+        // Apply gravity
+        var currentGravityMultiplier = _rigidbody.linearVelocity.y > 0
+            ? jumpGravityMultiplier
+            : gravityMultiplier;
+
+        _rigidbody.AddForce(
+            Physics.gravity * currentGravityMultiplier,
+            ForceMode.Acceleration
+        );
 
         // Rotate left/right
         var turnAmount = horizontalInput * rotationSpeed * Time.fixedDeltaTime;
@@ -75,12 +101,37 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void UpdateGroundedState()
     {
-        foreach (ContactPoint contact in collision.contacts)
+        // If we're moving upward, we definitely aren't grounded.
+        if (_rigidbody.linearVelocity.y > 0.01f)
         {
-            // A normal pointing upward means we're on top of something
-            if (contact.normal.y > 0.5f)
+            _isGrounded = false;
+            return;
+        }
+
+        var rayOrigin = new Vector3(
+            _collider.bounds.center.x,
+            _collider.bounds.min.y + 0.02f,
+            _collider.bounds.center.z
+        );
+
+        var rayDistance = 0.15f;
+
+        var hits = Physics.RaycastAll(
+            rayOrigin,
+            Vector3.down,
+            rayDistance,
+            ~0,
+            QueryTriggerInteraction.Ignore
+        );
+
+        _isGrounded = false;
+
+        foreach (var hit in hits)
+        {
+            // Don't detect our own collider as the ground.
+            if (hit.collider != _collider)
             {
                 _isGrounded = true;
                 return;
@@ -110,11 +161,6 @@ public class Player : MonoBehaviour
                 _playerHealth -= COLLISION_DAMAGE;
             }
         }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        _isGrounded = false;
     }
 
     public int GetPlayerHealth()
