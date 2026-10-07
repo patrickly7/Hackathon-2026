@@ -195,8 +195,6 @@ public class Player : MonoBehaviour
             var randomContainer = containers[Random.Range(0, containers.Length)];
 
             var spawnPosition = randomContainer.transform.position;
-            spawnPosition.y = 8f;
-
             _rigidbody.position = spawnPosition;
         }
 
