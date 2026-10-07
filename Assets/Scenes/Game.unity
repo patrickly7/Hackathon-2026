@@ -2851,7 +2851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d1b1a5bfc027d40a8315d99d3c8692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Timer
-  startingTime: 5
+  startingTime: 180
   startGameWhistleSFX: {fileID: 1861557946}
   endGameWhistleSFX: {fileID: 1357833830}
 --- !u!1 &1484722453
