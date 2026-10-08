@@ -90,27 +90,27 @@ public class Results : MonoBehaviour
     {
         var score = GameManager.Instance.GAME_SCORE;
 
-        if (score >= 50 && _damagedCount == 0)
+        if (score >= 150 && _damagedCount == 0)
         {
             SRankSFX.Play();
             return "S";
         }
-        else if (score >= 40 && _damagedCount <= 1)
+        else if (score >= 120 && _damagedCount <= 1)
         {
             ARankSFX.Play();
             return "A";
         }
-        else if (score >= 30 && _damagedCount <= 2)
+        else if (score >= 90 && _damagedCount <= 2)
         {
             BRankSFX.Play();
             return "B";
         }
-        else if (score >= 20 && _damagedCount <= 3)
+        else if (score >= 60 && _damagedCount <= 3)
         {
             CRankSFX.Play();
             return "C";
         }
-        else if (score >= 10 && _damagedCount <= 4)
+        else if (score >= 30 && _damagedCount <= 4)
         {
             DRankSFX.Play();
             return "D";
