@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     private float jumpForce = 5.0f;
 
     private float gravityMultiplier = 0.25f;
-    private float jumpGravityMultiplier = 2.0f;
+    private float jumpGravityMultiplier = 1.0f;
 
     public AudioSource flipCardSFX;
     public AudioSource whooshSFX;
