@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class CartWorker : MonoBehaviour
 {
-    public Transform pivot;
-
-    public float targetX = 10f;
-    public float targetZ = 5f;
+    public float endX;
     public float moveSpeed = 2f;
 
     private Vector3 _startPosition;
@@ -14,11 +11,10 @@ public class CartWorker : MonoBehaviour
     private void Start()
     {
         _startPosition = transform.position;
-
         _targetPosition = new Vector3(
-            targetX,
+            endX,
             transform.position.y,
-            targetZ
+            transform.position.z
         );
     }
 
@@ -34,13 +30,7 @@ public class CartWorker : MonoBehaviour
         // Arrived at destination.
         if (Vector3.Distance(transform.position, _targetPosition) < 0.01f)
         {
-            // Turn the worker/cart around.
-            transform.Rotate(0f, 180f, 0f);
-
-            // Swap destinations.
-            Vector3 temp = _targetPosition;
-            _targetPosition = _startPosition;
-            _startPosition = temp;
+            transform.position = _startPosition;
         }
     }
 }
