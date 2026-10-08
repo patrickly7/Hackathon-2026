@@ -90,7 +90,7 @@ public class Results : MonoBehaviour
     {
         var score = GameManager.Instance.GAME_SCORE;
 
-        if (score >= 120 && _damagedCount == 0 && _heavilyPlayedCount == 0 && _moderatelyPlayedCount == 0 && _lightlyPlayedCount == 0)
+        if (score >= 120 && _damagedCount == 0 && _heavilyPlayedCount == 0 && _moderatelyPlayedCount == 0)
         {
             SRankSFX.Play();
             return "S";
