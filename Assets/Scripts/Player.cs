@@ -29,10 +29,33 @@ public class Player : MonoBehaviour
     private bool _isGrounded;
     private bool _wasGrounded;
 
+    private bool _isFirstImage;
+    [SerializeField] private Texture2D spiritBandImage;
+    [SerializeField] private Texture2D lookAtYouImage;
+
+    private Renderer _planeRenderer;
+
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponentInChildren<Collider>();
+
+        var cardImage = GameObject.FindGameObjectWithTag("CardImage");
+
+        if (cardImage == null)
+        {
+            Debug.LogError("Could not find GameObject with tag CardImage!");
+        }
+        else
+        {
+            _planeRenderer = cardImage.GetComponent<Renderer>();
+
+            if (_planeRenderer == null)
+            {
+                Debug.LogError("CardImage was found, but it has no Renderer!");
+            }
+        }
+        _isFirstImage = true;
 
         _rigidbody.useGravity = false;
 
@@ -282,5 +305,16 @@ public class Player : MonoBehaviour
 
         _isGrounded = true;
         _wasGrounded = true;
+
+        if (_isFirstImage)
+        {
+            _planeRenderer.material.mainTexture = lookAtYouImage;
+            _isFirstImage = false;
+        }
+        else
+        {
+            _planeRenderer.material.mainTexture = spiritBandImage;
+            _isFirstImage = true;
+        }
     }
 }
