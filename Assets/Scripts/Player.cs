@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     private const int DRAG_DAMAGE = 1;
     private const int COLLISION_DAMAGE = 200;
     private const int JUMP_DAMAGE = 100;
+    private const int SPLASH_DAMAGE = 1000;
 
     private float movementSpeed = 5.0f;
     private float rotationSpeed = 100f;
@@ -21,6 +22,7 @@ public class Player : MonoBehaviour
     public AudioSource whooshSFX;
     public AudioSource plopSFX;
     public AudioSource damageSFX;
+    public AudioSource splashSFX;
 
     private int _playerHealth;
 
@@ -49,7 +51,7 @@ public class Player : MonoBehaviour
 
             if (_playerHealth > 0)
             {
-                _playerHealth -= JUMP_DAMAGE;
+                HandleDamage(JUMP_DAMAGE);
             }
         }
     }
@@ -102,7 +104,7 @@ public class Player : MonoBehaviour
             // DAMAGE: Decrease health if you're dragging the card across the ground
             if (_isGrounded && _playerHealth > 0)
             {
-                _playerHealth -= DRAG_DAMAGE;
+                HandleDamage(DRAG_DAMAGE);
             }
         }
     }
@@ -147,27 +149,37 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        foreach (ContactPoint contact in collision.contacts)
+        // Splash when touching a Spill
+        if (collision.gameObject.CompareTag("Spill"))
         {
-            // Landing on top of something = no damage
-            if (contact.normal.y > 0.5f)
+            splashSFX.Play();
+
+            HandleDamage(SPLASH_DAMAGE);
+        }
+        else
+        {
+            foreach (ContactPoint contact in collision.contacts)
             {
-                continue;
-            }
-
-            // Direction from the player toward the object
-            var directionToCollision = -contact.normal;
-
-            // How much the collision is coming from the front
-            var forwardAmount = Vector3.Dot(transform.forward, directionToCollision);
-
-            if (forwardAmount > 0.5f && _playerHealth > 0)
-            {
-                damageSFX.Play();
-
-                if (_playerHealth > 0)
+                // Landing on top of something = no damage
+                if (contact.normal.y > 0.5f)
                 {
-                    _playerHealth -= COLLISION_DAMAGE;
+                    continue;
+                }
+
+                // Direction from the player toward the object
+                var directionToCollision = -contact.normal;
+
+                // How much the collision is coming from the front
+                var forwardAmount = Vector3.Dot(transform.forward, directionToCollision);
+
+                if (forwardAmount > 0.5f && _playerHealth > 0)
+                {
+                    damageSFX.Play();
+
+                    if (_playerHealth > 0)
+                    {
+                        HandleDamage(COLLISION_DAMAGE);
+                    }
                 }
             }
         }
@@ -205,6 +217,18 @@ public class Player : MonoBehaviour
     public int GetDefaultHealth()
     {
         return DEFAULT_HEALTH;
+    }
+
+    private void HandleDamage(int damage)
+    {
+        if (damage > _playerHealth)
+        {
+            _playerHealth = 0;
+        }
+        else
+        {
+            _playerHealth -= damage;
+        }
     }
 
     public void HandleCardScoreCalculation()
